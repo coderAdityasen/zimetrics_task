@@ -59,8 +59,8 @@ Structured the application following production best practices with separation o
 
 ### 3. GET Request - Filter by Year
 
-![Filter Books](./photos/SearchBook.png)
+![Filter Books](./photos/searchBook.png)
 
 ### 4. DELETE Request - Remove Book
 
-![Delete Book](./photos/deleteBook.png)
+![Delete Book](./photos/DeleteBook.png)
