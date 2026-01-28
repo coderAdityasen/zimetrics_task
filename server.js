@@ -1,32 +1,47 @@
 const express = require("express");
-const mongoose = require("mongoose");
-const bookRoutes = require("./routes/book.route.js");
+const fs = require("fs");
+const cors = require("cors");
 
 const app = express();
-const PORT = 8000;
+const PORT = 3000;
+const DATA_FILE = "./tasks.json";
 
-// mongodb connectivity to mongodbcompass locally
-const connectDB = async () => {
-  try {
-    await mongoose.connect("mongodb://localhost:27017/testapp");
-    console.log("MongoDB connected");
-  } catch (error) {
-    console.error("MongoDB connection failed:", error.message);
-    process.exit(1);
-  }
-};
-connectDB();
-
+app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("MongoDB connected!");
+// Helper function to read tasks
+function readTasks() {
+  const data = fs.readFileSync(DATA_FILE);
+  return JSON.parse(data);
+}
+
+// Helper function to write tasks
+function writeTasks(tasks) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(tasks, null, 2));
+}
+
+// API: List Tasks
+app.get("/tasks", (req, res) => {
+  const tasks = readTasks();
+  res.json(tasks);
 });
 
-// api routes to book api in book route file
-app.use("/api", bookRoutes);
+// API: Add Task
+app.post("/tasks", (req, res) => {
+  const { task } = req.body;
 
-// port running on 8000 locally
+  if (!task) {
+    return res.status(400).json({ error: "Task is required" });
+  }
+
+  const tasks = readTasks();
+  tasks.push({ id: Date.now(), task });
+
+  writeTasks(tasks);
+  res.status(201).json({ message: "Task added" });
+});
+
+// Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
